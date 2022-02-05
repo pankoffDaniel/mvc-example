@@ -1,33 +1,36 @@
 import sys
 
-from core.controllers import RunController
+from core.controllers import \
+    RunController, \
+    ErrorController, \
+    AnotherController
 
 
 class CLI:
+
+    @classmethod
+    def __init__(cls):
+        cls.main()
 
     @classmethod
     def main(cls):
         user_action = cls.asc_user_action()
         cls.run_controller(user_action)
 
-    @staticmethod
-    def run_controller(user_action: str):
+    @classmethod
+    def run_controller(cls, user_action: str):
         action_controllers = {
             'run': RunController,
+            'another_function': AnotherController(),
         }
         try:
-            action_controllers[user_action]().main()
+            action_controllers[user_action]()
         except KeyError:
-            print('Incorrect value!')
+            ErrorController('Incorrect Value')
 
     @classmethod
     def asc_user_action(cls):
         user_action = input('Your action (run/exit): ')
         if user_action == 'exit':
-            print('Goodbye!')
-            cls.exit()
+            sys.exit(0)
         return user_action
-
-    @staticmethod
-    def exit():
-        sys.exit(0)
