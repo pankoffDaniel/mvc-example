@@ -1,9 +1,8 @@
-import sqlite3
 import sys
 
 from src.controllers import Controller
+from src.models import ConfigModel
 from src.views import View
-from core.db import Database
 
 
 class CLI:
@@ -20,7 +19,6 @@ class CLI:
             '2': 'Exit',
         },
     }
-    db = Database()
 
     @classmethod
     def __init__(cls):
@@ -29,14 +27,24 @@ class CLI:
     @classmethod
     def get_interface(cls) -> dict:
         """Return the interface in depending on the config."""
-        if cls.is_config_exists():
+        if ConfigModel.is_config_exists():
             return cls.interfaces['config_exists']
         return cls.interfaces['config_not_exists']
 
     @classmethod
+    def ask_while_empty(cls, text: str) -> str:
+        """Ask user while input is empty in loop."""
+        while True:
+            result = input(text)
+            if result:
+                return result
+
+    @classmethod
     def configure(cls):
         """Configure user data in the Database."""
-        pass
+        token = cls.ask_while_empty('Token: ')
+        language = cls.ask_while_empty('Language: ')
+        ConfigModel.configure(token, language)
 
     @classmethod
     def start_user_action(cls, user_action: str):
@@ -55,16 +63,6 @@ class CLI:
         user_action = cls.ask_user_action(interface)
         if user_action:
             cls.start_user_action(user_action)
-
-    @classmethod
-    def is_config_exists(cls) -> bool:
-        """Return True if config exists, or else - False."""
-        with cls.db as db:
-            try:
-                db.execute('SELECT EXISTS(SELECT * FROM config LIMIT 1)')
-            except sqlite3.OperationalError:  # case when table doest not exist
-                return False
-            return db.cursor.fetchone()[0]
 
     @classmethod
     def exit(cls):
