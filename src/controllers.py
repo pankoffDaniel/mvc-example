@@ -1,5 +1,4 @@
 from .views import View
-from .services import get_data
 
 
 class Controller:
@@ -12,7 +11,7 @@ class Controller:
     @classmethod
     def main(cls):
         """The main logic of the Controller."""
-        result = get_data()
+        result = 'Some result data'
         cls.run_view(result)
 
     @classmethod
